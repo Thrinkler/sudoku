@@ -59,6 +59,7 @@ Primero que nada, el ```__init__``` es fácil de explicar:
     
     def __init__(self, sudoku: list[list[int]]) -> None:
             self.sudoku = [line[:] for line in sudoku]
+            self.unsolved_sudoku = [line[:] for line in sudoku]
             self.box_size = int(len(sudoku)**0.5)
 
 Dado un sudoku dado, lo copiamos, aparte obtenemoos el tamaño de los cuadrantes. 
@@ -98,26 +99,38 @@ Lo que hace es tomar todos los números de la fila, columna y cuadrante distinto
  Y por último y más importante, ```solve_sudoku()```
 
     def solve_sudoku(self):
-        memoria = []
-        empty_cell = self.empty_cells()
-        i = 0
-        while i< len(empty_cell):
-            x,y = empty_cell[i]
-            pos_values = list(self.posible_values(x,y))
-            random.shuffle(pos_values)
-            
-            if len(pos_values) == 0: # Si no hay soluciones, nos regresamos uno
-                if not memoria: return False # Si no hay donde regresar, no hay soluciones
-                self.sudoku,pos_values,i = pila.pop() #Regresamos y continuamos
-                x,y = empty_cell[i]
-            self.sudoku[x][y] = pos_values.pop()
+      self.sudoku = [line[:] for line in self.unsolved_sudoku]
+      memory = []
+      empty_cell = self.empty_cells()
+      i = 0
+      while i< len(empty_cell):
+          x,y = empty_cell[i]
+          pos_values = list(self.posible_values(x,y))
+          random.shuffle(pos_values)
+          
+          if len(pos_values) == 0: # Si no hay soluciones, nos regresamos uno
+              if not memory: return False # Si no hay donde regresar, no hay soluciones
+              self.sudoku,pos_values,i = memory.pop() #Regresamos y continuamos
+              x,y = empty_cell[i]
+          self.sudoku[x][y] = pos_values.pop()
 
-            if pos_values:
-                pila.append([[line[:] for line in self.sudoku],pos_values,i])
-                
-            i+=1
-        return True 
-Aquí utilizamos ```pila```
+          if pos_values:
+              memory.append([[line[:] for line in self.sudoku],pos_values,i])
+              
+          i+=1
+      return True  
+Primero limpiamos el sudoku con ```self.sudoku = [line[:] for line in self.unsolved_sudoku]```, por si ya se había resuelto.
+Aquí utilizamos ```memory``` como la parte más importante del código. Esta va a guardar el sudoku en el momento después de poner nuestra elección de numero, junto con la lista de números que no hemos probado en esa posición, y un indicador para saber qué celda vacía fue cambiada. 
+
+Luego obtenemos ```self.empty_cell()``` y la guardamos para no tenerla que calcular cada vez que hacemos una iteración. Iniciamos el indicador al inicio de la lista con ```i=0```, y empezamos a tratar de resolver.
+
+Calculamos los posibles valores para la posición del valor vacío. Esos valores los revolvemos, y empezamos revisando que la celda tenga posibles movimientos. De no ser así, entonces debemos regresarnos en la memoria. (Si no hay memoria, el sudoku no tiene solución ya que no hay ninguna manera de que podamos regresar a la anterior versión ni tampoco manera de seguir adelante.) Volvemos a revisar la posición que nos da el indicador, y ponemos el siguiente valor posible.
+
+Por último, si es que siguen habiendo valores posibles, guardamos el sudoku hasta esa posición construida, los valores posibles y el indicador. Luego incrementamos el indicador para irnos con la siguiente celda vacía, con lo cual, si ya es igual de grande que la lista de celdas vacías, entonces quiere decir que ya completó el sudoku, con lo cual regresa verdadero.
+
+
+
+Notese que siempre estamos modificando el sudoku obtenido de la clase, con lo que tan solo tendremos que llamar a ese dato al final para ver qué tantas soluciones hay
 
 
 Cuando el profesor nos dió el desafío, entré rápidamente a los archivos compartidos por mi padre y encontré el código que él había construido. Algo que mi padre sabe hacer es un algoritmo muy corto, pero al mismo tiempo, todas sus variables son puras letras, así que no entendía con tan solo leer el código qué estaba pasando.
