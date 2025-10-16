@@ -53,5 +53,74 @@ Eso se escuchaba fácil, tan solo necesitaba mi propio solucionador para poder c
 
 ## Parte 1: El solucionador de Sudokus.
 
+Antes de seguir la historia, vamos a explicar el solucionador paso por paso.
+
+Primero que nada, el ```__init__``` es fácil de explicar:
+    
+    def __init__(self, sudoku: list[list[int]]) -> None:
+            self.sudoku = [line[:] for line in sudoku]
+            self.box_size = int(len(sudoku)**0.5)
+
+Dado un sudoku dado, lo copiamos, aparte obtenemoos el tamaño de los cuadrantes. 
+
+Luego sigamos con  ```empty_cells()```
+
+    def empty_cells(self):
+            empty_cell = []
+            for i in range(len(self.sudoku)):
+                for j in range(len(self.sudoku)):
+                    if self.sudoku[i][j] == 0:
+                        empty_cell.append([i,j])
+            
+            return empty_cell
+Aquí lo único que hacemos es pasar a través de todo el sudoku y guardamos en una lista las coordenadas de todos los vacíos.
+
+Despues, ```posible_values()```
+
+    def posible_values (self, int_row:int,int_column:int):
+            row = set(self.sudoku[int_row])
+            column = set([r[int_column] for r in self.sudoku])
+    
+            start_row = self.box_size* (int_row//self.box_size)
+            start_column = self.box_size* (int_column//self.box_size)
+            
+            box = set()
+            for r in range(start_row, start_row + self.box_size):
+                for c in range(start_column, start_column + self.box_size):
+                    box.add(self.sudoku[r][c])
+            
+            all_digits = row.union(column).union(box) -set([0])
+            return (set(range(1,len(self.sudoku)+1))-all_digits)
+
+Esta utiliza la magia que tienen los sets en python de que al unirlos, no se repiten los valores.
+Lo que hace es tomar todos los números de la fila, columna y cuadrante distintos de 0, los une en un set, y regresa el complemento de ese set sin contar el 0.
+
+ Y por último y más importante, ```solve_sudoku()```
+
+    def solve_sudoku(self):
+        memoria = []
+        empty_cell = self.empty_cells()
+        i = 0
+        while i< len(empty_cell):
+            x,y = empty_cell[i]
+            pos_values = list(self.posible_values(x,y))
+            random.shuffle(pos_values)
+            
+            if len(pos_values) == 0: # Si no hay soluciones, nos regresamos uno
+                if not memoria: return False # Si no hay donde regresar, no hay soluciones
+                self.sudoku,pos_values,i = pila.pop() #Regresamos y continuamos
+                x,y = empty_cell[i]
+            self.sudoku[x][y] = pos_values.pop()
+
+            if pos_values:
+                pila.append([[line[:] for line in self.sudoku],pos_values,i])
+                
+            i+=1
+        return True 
+Aquí utilizamos ```pila```
+
+
+Cuando el profesor nos dió el desafío, entré rápidamente a los archivos compartidos por mi padre y encontré el código que él había construido. Algo que mi padre sabe hacer es un algoritmo muy corto, pero al mismo tiempo, todas sus variables son puras letras, así que no entendía con tan solo leer el código qué estaba pasando.
+
 
 
