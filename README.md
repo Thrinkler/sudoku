@@ -56,16 +56,16 @@ Eso se escuchaba fácil, tan solo necesitaba mi propio solucionador para poder c
 Antes de seguir la historia, vamos a explicar el solucionador paso por paso.
 
 Primero que nada, el ```__init__``` es fácil de explicar:
-    
+```python  
     def __init__(self, sudoku: list[list[int]]) -> None:
             self.sudoku = [line[:] for line in sudoku]
             self.unsolved_sudoku = [line[:] for line in sudoku]
             self.box_size = int(len(sudoku)**0.5)
-
+```
 Dado un sudoku dado, lo copiamos, aparte obtenemoos el tamaño de los cuadrantes. 
 
 Luego sigamos con  ```empty_cells()```
-
+```python
     def empty_cells(self):
             empty_cell = []
             for i in range(len(self.sudoku)):
@@ -74,10 +74,12 @@ Luego sigamos con  ```empty_cells()```
                         empty_cell.append([i,j])
             
             return empty_cell
+```
 Aquí lo único que hacemos es pasar a través de todo el sudoku y guardamos en una lista las coordenadas de todos los vacíos.
 
 Despues, ```posible_values()```
 
+```python
     def posible_values (self, int_row:int,int_column:int):
             row = set(self.sudoku[int_row])
             column = set([r[int_column] for r in self.sudoku])
@@ -92,12 +94,12 @@ Despues, ```posible_values()```
             
             all_digits = row.union(column).union(box) -set([0])
             return (set(range(1,len(self.sudoku)+1))-all_digits)
-
+```
 Esta utiliza la magia que tienen los sets en python de que al unirlos, no se repiten los valores.
 Lo que hace es tomar todos los números de la fila, columna y cuadrante distintos de 0, los une en un set, y regresa el complemento de ese set sin contar el 0.
 
  Y por último y más importante, ```solve_sudoku()```
-
+```python
     def solve_sudoku(self):
       self.sudoku = [line[:] for line in self.unsolved_sudoku]
       memory = []
@@ -118,7 +120,8 @@ Lo que hace es tomar todos los números de la fila, columna y cuadrante distinto
               memory.append([[line[:] for line in self.sudoku],pos_values,i])
               
           i+=1
-      return True  
+      return True
+```
 Primero limpiamos el sudoku con ```self.sudoku = [line[:] for line in self.unsolved_sudoku]```, por si ya se había resuelto.
 Aquí utilizamos ```memory``` como la parte más importante del código. Esta va a guardar el sudoku en el momento después de poner nuestra elección de numero, junto con la lista de números que no hemos probado en esa posición, y un indicador para saber qué celda vacía fue cambiada. 
 
@@ -142,7 +145,7 @@ Cuando el profesor nos dió el desafío, entré rápidamente a los archivos comp
 De nuevo explicaremos el código antes de seguir con la historia.
 
 Dado que el contador de soluciones está en la misma clase que el solucionador, todos los métodos usados ya se explicaron anteriormente, por lo que pasaremos a explicar únicamente la clase ```find_all_solutions()```
-
+```python
     def find_all_solutions(self):
         self.sudoku = [line[:] for line in self.unsolved_sudoku]
         solutions_count = 0
@@ -176,7 +179,7 @@ Dado que el contador de soluciones está en la misma clase que el solucionador, 
                 
             
             i+=1
-
+```
 Notemos que estamos usando casi el mismo código que el solucionador, aunque con unas distintas diferencias que explicaremos una por una.
 
 Para empezar, definimos ```x,y``` y ```pos_values``` antes para que el interprete de python sepa qué son cada uno de ellos. Esto porque ya cuando lo está solucionando, metemos a un ```if``` todo eso para que no calcule una posición cuando ya está completo el sudoku. En vez de eso, si está completo, tratamos a que está completo como si fuera un caso incorrecto, tan solo sumando 1 al recuento de soluciones. Se sigue el algoritmo del solucionador exactamente igual, con la única diferencia de que no regresa nada al terminar el ciclo.
