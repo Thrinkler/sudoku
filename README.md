@@ -128,12 +128,60 @@ Calculamos los posibles valores para la posición del valor vacío. Esos valores
 
 Por último, si es que siguen habiendo valores posibles, guardamos el sudoku hasta esa posición construida, los valores posibles y el indicador. Luego incrementamos el indicador para irnos con la siguiente celda vacía, con lo cual, si ya es igual de grande que la lista de celdas vacías, entonces quiere decir que ya completó el sudoku, con lo cual regresa verdadero.
 
+Notese que siempre estamos modificando el sudoku obtenido de la clase, con lo que tan solo tendremos que llamar a ese dato al final para ver el sudoku resuelto.
 
-
-Notese que siempre estamos modificando el sudoku obtenido de la clase, con lo que tan solo tendremos que llamar a ese dato al final para ver qué tantas soluciones hay
+---
 
 
 Cuando el profesor nos dió el desafío, entré rápidamente a los archivos compartidos por mi padre y encontré el código que él había construido. Algo que mi padre sabe hacer es un algoritmo muy corto, pero al mismo tiempo, todas sus variables son puras letras, así que no entendía con tan solo leer el código qué estaba pasando.
+
+
+
+## Parte 2: El contador de soluciones
+
+De nuevo explicaremos el código antes de seguir con la historia.
+
+Dado que el contador de soluciones está en la misma clase que el solucionador, todos los métodos usados ya se explicaron anteriormente, por lo que pasaremos a explicar únicamente la clase ```find_all_solutions()```
+
+    def find_all_solutions(self):
+        self.sudoku = [line[:] for line in self.unsolved_sudoku]
+        solutions_count = 0
+        memory = []
+        empty_cell = self.empty_cells()
+
+        i = 0
+        
+
+        x,y = empty_cell[i]
+        pos_values = list(self.posible_values(x,y))
+        has_found = False
+        while True:
+            
+            if i < len(empty_cell):
+                x,y = empty_cell[i]
+                pos_values = list(self.posible_values(x,y))
+                random.shuffle(pos_values)
+
+            if i== len(empty_cell) or len(pos_values) == 0: # Si hay una solución, la contamos y regresamos
+                if i == len(empty_cell): 
+                    solutions_count+=1
+                if not memory: return solutions_count # Si no hay donde regresar, encontramos todas.
+                
+                self.sudoku,pos_values,i = memory.pop()
+                x,y = empty_cell[i]
+                
+            self.sudoku[x][y] = pos_values.pop()
+            if len(pos_values) >0:
+                memory.append([[line[:] for line in self.sudoku],pos_values,i])
+                
+            
+            i+=1
+
+Notemos que estamos usando casi el mismo código que el solucionador, aunque con unas distintas diferencias que explicaremos una por una.
+
+Para empezar, definimos ```x,y``` y ```pos_values``` antes para que el interprete de python sepa qué son cada uno de ellos. Esto porque ya cuando lo está solucionando, metemos a un ```if``` todo eso para que no calcule una posición cuando ya está completo el sudoku. En vez de eso, si está completo, tratamos a que está completo como si fuera un caso incorrecto, tan solo sumando 1 al recuento de soluciones. Se sigue el algoritmo del solucionador exactamente igual, con la única diferencia de que no regresa nada al terminar el ciclo.
+
+
 
 
 
