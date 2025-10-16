@@ -185,6 +185,143 @@ Notemos que estamos usando casi el mismo código que el solucionador, aunque con
 Para empezar, definimos ```x,y``` y ```pos_values``` antes para que el interprete de python sepa qué son cada uno de ellos. Esto porque ya cuando lo está solucionando, metemos a un ```if``` todo eso para que no calcule una posición cuando ya está completo el sudoku. En vez de eso, si está completo, tratamos a que está completo como si fuera un caso incorrecto, tan solo sumando 1 al recuento de soluciones. Se sigue el algoritmo del solucionador exactamente igual, con la única diferencia de que no regresa nada al terminar el ciclo.
 
 
+---
 
+Sigamos con la historia. Yo ya estaba muy cansado cuando por fin pudo resolver un sudoku el solucionador, pero eso no evitó que tratara lo más que pudiera para hacer el contador.
+
+Tengo que admitir que yo, a las 10 de la noche y con sueño, ni siquiera sabía qué quería hacer... Mi primer algoritmo del solucionador tenía todavía mucho código repetido (todavía tenía el mismo código en la parte de si encontraba una solución y la parte donde ya no había)
+
+
+## Parte 3: El generador
+
+Aquí tenemos una nueva clase, la clase creator.
+
+```python
+def __init__(self, size = 3) -> None:
+        self.size = size**2
+```
+Aquí tan solo definimos el tamaño de la matríz del sudoku con el tamaño de un cuadrante.
+
+```python
+def new_sudoku_ending(self):
+        s = Solver([[0 for _ in range(self.size)]for _ in range(self.size)])
+        s.solve_sudoku()
+        return s.sudoku
+```
+Esta función lo único que hace es que el solucionador del sudoku resuelva un sudoku vacío. Dado que agarramos una de las posibilidades aleatoriamente, el final de todos los sudokus es aleatorio.
+
+```python
+def create_sudoku(self, max_clues=17):
+        sudoku = self.new_sudoku_ending()
+
+        clues = len(sudoku)* len(sudoku[0])
+        pos_clues = [[[x,y] for x in range(0,len(sudoku))]for y in range(0,len(sudoku))]
+
+        p_clues = []
+        not_watched_clues = []
+        for line in pos_clues:
+            p_clues += [i[:] for i in line]
+            not_watched_clues += [i[:] for i in line]
+        
+        n =0
+
+        while True:
+            if len(not_watched_clues) == 0: #Si ya se probó quitar todos los números 
+                return sudoku               #y hay más de una solución si los quitas, regresa el sudoku
+            
+            x,y = random.choice(not_watched_clues)
+            removed_clue = sudoku[x][y]        
+            sudoku[x][y] = 0
+            not_watched_clues.remove([x,y])
+
+            s = Solver(sudoku)
+            if(s.find_all_solutions() == 1):
+                clues-=1
+                p_clues.remove([x,y])
+                not_watched_clues = [line[:] for line in p_clues]
+
+            else:
+                sudoku[x][y] = removed_clue
+                
+            n+=1
+            print(n, clues)
+```
+Aquí lo primero que hacemos es obtener uno de los finales del sudoku. Con ese vamos a operar.
+
+Obtenemos el número de pistas que tiene el sudoku. Como está resuelto, el número de pistas es el tamaño de toda la matríz generada. De la misma manera, generamos todas las coordenadas de las claves, y las guardamos en dos arreglos distintos.
+
+Inicamos la busqueda iterativa. Primero revisamos si es que hay pistas no vistas, si es que no las hay, quiere decir que ya no podemos quitar ninguna pista sin obtener más de una solución y regresamos el sudoku con menos pistas. En otro caso, tomamos de la lista de pistas no vistas, la quitamos de las que no hemos visto, y ponemos un 0 en ese lugar en el sudoku. Los 0 representan los lugares vacíos. Luego, con el sudoku ya cambiado, genera un solucionador para que revise cuántas posibles soluciones hay. Si solo tiene una solucion, sabemos que sin esa pista sigue teniendo una respuesta única, por lo que buscaremos de nuevo si se puede quitar otra pista. En otro caso, debemos de regresar la pista a su lugar.
+
+
+### Bonus: Encontrar un sudoku con claves mínimas.
+
+Aunque posteriormente haremos una extensión de este proyecto enfocado en algebra, donde demostraremos una manera de generar sudokus en base de una plantilla, podemos ver muy fácilmente que con nuestro anterior algoritmo estamos entrando a un "minimo local" en vez de un "minimo absoluto", donde, para un sudoku de $9 \times 9$, el número minimo de claves está entre 81 y 17 (demostrado en 2012 que 17 es el número mínimo de posibilidades para un sudoku de $9 \times 9$). Con pruebas prácticas, el número que he logrado llegar antes de no poder quitar más pistas es de 25 a 17, pero es frustrante llegar a 24 claves y no poder bajar de ahí, cuando anteriormente había llegado a 20. Así que refactoricé el algoritmo de creación con  un pequeño cambio:
+
+```python
+def create_min_sudoku(self, max_clues=17):
+        sudoku = self.new_sudoku_ending()
+        solved_sudoku = [line[:] for line in sudoku]
+
+        clues = len(sudoku)* len(sudoku[0])
+        pos_clues = [[[x,y] for x in range(0,len(sudoku))]for y in range(0,len(sudoku))]
+
+        p_clues = []
+        not_watched_clues = []
+        for line in pos_clues:
+            p_clues += [i[:] for i in line]
+            not_watched_clues += [i[:] for i in line]
+        n =0
+
+        min_ret_sudoku = []
+        min_clues = clues
+
+        has_not_complete_one = True
+
+        while clues > max_clues and (n<500 or has_not_complete_one):
+
+            if len(not_watched_clues) == 0: #Si ya se probó quitar todos los números 
+                if clues < min_clues:       #y hay más de una solución si los quitas
+                    min_ret_sudoku = [line[:] for line in sudoku]
+                    min_clues = clues
+                has_not_complete_one = False
+                a,b = random.randint(0,len(sudoku)-1),random.randint(0,len(sudoku)-1)
+
+                for line in [[(a+i)%len(sudoku),(b+random.randint(0,len(sudoku)-1))%len(sudoku)] for i in range(len(sudoku))]:
+                    if line not in p_clues:
+                        p_clues.append(line)
+                        sudoku[line[0]][line[1]] = solved_sudoku[line[0]][line[1]]
+                        clues+=1
+                not_watched_clues = [line[:] for line in p_clues]
+                
+            
+            x,y = random.choice(not_watched_clues)
+            removed_clue = sudoku[x][y]        
+            sudoku[x][y] = 0
+
+            s = Solver(sudoku)
+            if(s.find_all_solutions() == 1):
+                clues-=1
+                p_clues.remove([x,y])
+                not_watched_clues = [line[:] for line in p_clues]
+
+            else:
+                sudoku[x][y] = removed_clue
+                not_watched_clues.remove([x,y])
+            if n%5 == 0:
+                print(n, clues)
+            n+=1
+
+        return min_ret_sudoku
+```
+
+Este tiene un pequeño cambio, tomado directamente de la función de encontrar distintas soluciones. Si es que se le acaban las respuestas, en vez de entregar el sudoku, levanta una bandera de que ya encontró al menos uno, si es que tiene el minimo de pistas, lo guarda, en una variable que contiene solo el sudoku con menor número de claves. Luego genera unas posiciones aleatorias para luego ponerlas dentro del sudoku, contando cada clave añadida. De aquí vuelve a generar las claves posibles y las guarda como claves no vistas y vuelve a empezar el algoritmo. Termina hasta que llega ya sea a un número de pistas máximo que quieres o si ya completó 500 iteraciones.
+
+---
+
+Y entonces ahí estaba, 9:40 de la mañana, ya con el sentimiento de que por fin logré completar el solucionador y al mismo tiempo ya estaba en la parte final. Así, sintiendo como si hubiera por fin terminado de haber reparado el motor de un deportivo en medio del desierto, empiezo a programar la primera versión del generador.
+
+La primera versión hacía lo que se me había ocurrido al inicio, verificar si una posición aleatoria era una clave, y quitarla. Verificar que solo hubiera una solución, y si es que había más, volver a poner el número quitado e intentar con otro.
+
+Esa fue la versión que le presenté a mi profesor, programado en tan solo 10 minutos para poder correr a la clase de probabilidad, verla a una amiga, y por fin decirle a todos que había generado un solucionador de sudokus.
 
 
