@@ -2,12 +2,12 @@ import random
 from sudoku_solver import Solver
 class Creator:
     
-    def __init__(self) -> None:
-        self.tamano = 9
+    def __init__(self, size = 3) -> None:
+        self.size = size**2
     
 
     def new_sudoku_ending(self):
-        s = Solver([[0 for _ in range(self.tamano)]for _ in range(self.tamano)])
+        s = Solver([[0 for _ in range(self.size)]for _ in range(self.size)])
         s.solve_sudoku()
         return s.sudoku
 

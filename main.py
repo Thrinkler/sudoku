@@ -22,7 +22,7 @@ def sudoku_test():
         print(line)
 
 def sudoku_creator():
-    sud = Creator().create_sudoku()
+    sud = Creator(4).create_sudoku()
 
     for line in sud:
         print(line)
