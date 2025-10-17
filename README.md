@@ -5,12 +5,11 @@ En las siguientes lineas se presentarán 3 algoritmos distintos:
 - Un algoritmo que resuelve cualquier sudoku de $n^2 \times n^2$ dado, revisando al mismo tiempo si puede ser resuelto.
 - Un algoritmo que revisa cuántas soluciones tiene un sudoku de $n^2 \times n^2$  dado.
 - Un generador de sudokus de $n^2 \times n^2$.
-  
+
+Todos estos algoritmos serán totalmente iterativos, sin ningún tipo de recursión utilizada. Esto nos ayudará a entender mejor lo que pasa detrás de cada algoritmo, y poder guardar solo los datos necesarios.
 Para esto, se utilizará python, utilizando clases para clasificar los algoritmos como Creador y Solucionador, de tal manera
 que los algoritmos relacionados puedan utilizar las funciones que comparten unos entre otros, y poder usar los algoritmos como
 objetos para una mejor comprensión de lo que hace cada uno de ellos. La única librería que se utilizará será random.
-
-Todos los algoritmos serán iterativos, lo que nos ayudará a comprender mejor el proceso de cada uno de ellos.
 
 ## Introducción.
 
@@ -357,5 +356,12 @@ Así que voy con mis amigos, ahí, mientras estoy con ellos, entiendo que ya ten
 
 Y de esa manera, llegué al mejor algoritmo para encontrar una solución única, y que con el mismo estoy seguro que no puedes quitar ni una sola pista más sin que ya no tenga otra solución.
 
+Y de esta manera, completé el proyecto del sudoku en 4 horas de trabajo duro, y al mismo tiempo volver a respetar al algoritmo de generadores.
 
+
+## Conclusión
+
+A veces estos proyectos que empiezan siendo un simple desafío, terminan demostrandonos todas las cosas que nos faltan aprender, así como todas las cosas que nos han faltado aprender, pero también nos ayuda a entender nuestras debilidades y fortalezas ante los proyectos que nos encontremos. Este proyecto empezó con una idea de cómo funcionaría al final, pero nunca me imaginé que el camino hasta donde quería llegar tuviera tantos obstaculos y que me demostrara a respetar hasta los algoritmos que me parecen simples de explicar. 
+
+Este proyecto es un simple generador de sudokus que logra resolverlos al mismo tiempo. Espero que les haya gustado este artículo del proceso para construir un buen algoritmo.
 
