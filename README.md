@@ -136,7 +136,19 @@ Notese que siempre estamos modificando el sudoku obtenido de la clase, con lo qu
 ---
 
 
-Cuando el profesor nos dió el desafío, entré rápidamente a los archivos compartidos por mi padre y encontré el código que él había construido. Algo que mi padre sabe hacer es un algoritmo muy corto, pero al mismo tiempo, todas sus variables son puras letras, así que no entendía con tan solo leer el código qué estaba pasando.
+La clase donde nos platicaron del proyecto fue un lunes. Cuando el profesor nos dió el desafío, entré rápidamente a los archivos compartidos por mi padre y encontré el código que él había construido. Lo encontré y lo puse a un lado para empezarlo después, de cualquier manera todavía tenía unas cuantas cosas que hacer, y pensé que podía hacerlo todo tan rápido que no me tomaría más de una tarde. Así que lo dejé aplazado un día. El martes se veía un buen día para empezarlo, pero para nada iba a dejar de ir al gimnasio, así que en cuanto llegue a mi casa, tomé una taza de café, comí, y luego entrené, me habían dado ya las 6:50 de la noche.
+
+Empecé a las 7 de la noche del martes. Consideraba que era un buen tiempo pues la clase empezaría a las 12 del día siguiente. Y yo, todo emocionado, empiezo a leer los archivos, hacerme una idea mental, y empezar a programar. Algo que mi padre sabe hacer es un algoritmo muy corto, pero al mismo tiempo, casi no nombra a sus variables, solo las nombra con puras letras, así que no entendía con tan solo leer el código qué estaba pasando de una manera intuitiva. Eso no evitó que al menos tratara de entender el código, y luego de más de una media hora de leer 20 lineas de código una y otra vez, entendí por fín lo que hacía. Al final, toda la ciencia era guardar en una memoria al sudoku, con sus posibles soluciones y las posiciones del número eliminado. 
+
+Y de pronto me pasó algo... A veces me pasa que comprendo algo, pero a la hora de programarlo, subestimo al algoritmo, y ni siquiera le presto atención a lo que estoy haciendo. Esta vez fue una de esas veces, y realmente me tardé más de lo que debía porque ni siquiera quería revisar qué era lo que no funcionaba cada que había un error. Pasaba un error de indice fuera de rango, lo arreglaba evitando que llegara con un if. Había un problema con el backtracking, le ponía cada vez más datos para que lograra funcionar. Llegó un momento en que esa función fue de 50 lineas, Y SEGUÍA SIN FUNCIONAR.
+
+Total que por fin, ya a las 8:30 de la noche, me decido a por fin leer todo lo que había escrito desde cero, como si me estuviera explicando a mí mismo qué hace cada parte. De esa manera, quité código que no se necesitaba, ifs que parecía que evitaban problemas pero que al final causaban más problemas, y entonces fue cuando me di cuenta de algo: La función de valores posibles estaba mal calculada...
+
+Casi tiro mi computadora por la ventana. Directamente le vuelvo a copiar a mi padre el cálculo del cuadrante para que ya no haya problema, y procede el algoritmo a funcionar.
+
+1 hora y 30 minutos... tratando de hacer y arreglar un código cuyo problema no era en sí ese código, sino una función que había hecho sin revisar nada. Me sentí como si hubiera tratando de construir una resortera y me hubiera tardado 10 horas.
+
+Y lo peor de todo: Este código solo lo necesitaba para empezar a programar el contador de soluciones...
 
 
 
@@ -187,10 +199,23 @@ Para empezar, definimos ```x,y``` y ```pos_values``` antes para que el interpret
 
 ---
 
-Sigamos con la historia. Yo ya estaba muy cansado cuando por fin pudo resolver un sudoku el solucionador, pero eso no evitó que tratara lo más que pudiera para hacer el contador.
+Sigamos con la historia. Yo ya estaba muy cansado cuando por fin pudo resolver un sudoku el solucionador, pero efectivamente, el contador de soluciones era el corazón del algoritmo que había planeado para generar sudokus. No podía parar cuando apenas había empezado.
 
-Tengo que admitir que yo, a las 10 de la noche y con sueño, ni siquiera sabía qué quería hacer... Mi primer algoritmo del solucionador tenía todavía mucho código repetido (todavía tenía el mismo código en la parte de si encontraba una solución y la parte donde ya no había)
+Descansé una media hora mientras cenaba, y a las 9:00 de la noche, luego de seguir con la espina, decidí continuar. Ahora el problema era más sencillo: Dado el sudoku completo, tan solo marcalo como incorrecto y regresate...
 
+Pero ¿qué significa completo? Antes de hacer el código del solucionador, tenía en dos ifs qué pasaba si no encontraba una posible respuesta y qué pasaba si sí, pero antes, en vez de usar un iterador sobre la lista de vacíos, las eliminaba y guardaba cómo estaba después.
+
+Lo primero que hice para el caso donde estuviera completo fue hacer un nuevo if con lo mismo que el caso donde estaba mal. Por alguna razón no funcionaba, tengo la teoría de que era porque primero ponía la respuesta correcta, luego me metía al de completarlo, me regresaba, pero como no había sumado la iteración del completo, entonces se desfazaba.
+
+Ya eran las 9:30 de la noche. Realmente estaba cansado, así que decidí que el día siguiente sería muy bueno para continuar, de todas maneras me quedaban solo 14 horas y media para la clase. Podría continuarlo llegando a la facultad a las 8 de la mañana, y si me iba bien, lo terminaría a las 9.
+
+Así que eso hice. A las 8 de la mañana del día siguiente seguí, y luego de una hora de leer, tratar de añadir partes y tratar de salvar mi código, terminé borrandolo y empezando desde cero. El solucionador tenía mucho código repetido que si se lo quitaba, se entendría mejor el algoritmo, y el contador de soluciones tenía un pegoste de un tercer caso que hacía que todo el código dejara de funcionar, así que arreglé el solucionador, copié el código de nuevo, y empecé de nuevo, ahora sabiendo algo muy claro: No voy a repetir código.
+
+Fue ahí cuando puse la linea más clara, ```if i== len(empty_cell) or len(pos_values) == 0:```, donde tan solo le añadí el ```or len(pos_values) == 0``` para entender totalmente que ese código tenía que hacer lo mismo... Y seguía mandando error.
+
+Seguía pasando un error, solo pasaba si terminaba, y era porque el iterador se volvía más grande de lo que debía si es que llegaba al máximo. Me tardé un poco tratando de entender el error, solucionarlo, y cuando ya por fin había entendido que no podía asignar a x,y si es que ya estaba completo el sudoku, le puse ese if a la primera parte, copié el código antes del iterador, y por fin funcionó.
+
+Y lo había hecho, el corazón de mi proyecto, la parte fundamental para el generador de sudokus había llegado a su fin. Podía usar todo el tiempo que me quedaba para entrar a mi clase de probabilidad a las 10 de la mañana, tal vez incluso terminar el proyecto de una vez por todas... Tan solo eran... las 9:40.
 
 ## Parte 3: El generador
 
@@ -318,10 +343,19 @@ Este tiene un pequeño cambio, tomado directamente de la función de encontrar d
 
 ---
 
-Y entonces ahí estaba, 9:40 de la mañana, ya con el sentimiento de que por fin logré completar el solucionador y al mismo tiempo ya estaba en la parte final. Así, sintiendo como si hubiera por fin terminado de haber reparado el motor de un deportivo en medio del desierto, empiezo a programar la primera versión del generador.
+Y entonces ahí estaba, 9:40 de la mañana, ya con el sentimiento de que por fin logré completar el solucionador y al mismo tiempo ya estaba en la parte final. Así, la hora no hizo más que motivarme, y entonces, sintiendo como si hubiera por fin terminado de haber reparado el motor de un deportivo en medio del desierto, empecé a programar la primera versión del generador.
 
 La primera versión hacía lo que se me había ocurrido al inicio, verificar si una posición aleatoria era una clave, y quitarla. Verificar que solo hubiera una solución, y si es que había más, volver a poner el número quitado e intentar con otro.
 
-Esa fue la versión que le presenté a mi profesor, programado en tan solo 10 minutos para poder correr a la clase de probabilidad, verla a una amiga, y por fin decirle a todos que había generado un solucionador de sudokus.
+Dado el tiempo, se me ocurrió utilizar números aleatorios para agarrar una posición aleatoria, agarrar la primera clave que me encuentre, quitarla y verificar que tuviera una única solución. Luego pararlo pasadas unas 500 iteraciones, y regresar el sudoku generado. Ese fue el algoritmo que programé en mis ultimos 10 minutos antes de ir corriendo a mi clase, y logré por fin que funcionara. 
+
+Ya tenía el algoritmo completo. Literalmente me tardé más en solucionar un sudoku que en crearlo. 10 minutos. 
+
+Ese fue el algoritmo que le presenté a mi profesor, a lo que él me pidió que hiciera un artículo de cómo se me habían ocurrido cada uno de los algoritmos. Ya estaba sin presiones, ya estaba tranquilo. Me acosté en el pasto luego de la clase, con un dolor de cabeza descomunal que solo lo podía atribuir a una cosa: El código que presenté es la peor manera de generar un sudoku, y sobretodo, debía de haber una mejor manera de parar el código.
+
+Así que voy con mis amigos, ahí, mientras estoy con ellos, entiendo que ya tengo todas las posiciones de las claves en un inicio, y puedo ir pasando por ellas para quitarlas del sudoku, verificar que funciona sin ellas, y quitarlas de la lista. También veo que es mucho más fácil tener todas las posiciones ya revisadas guardadas, y pasar por las que no he visto... O mejor, guardar todas las que no he visto e irlas eliminando mientras paso por ellas.
+
+Y de esa manera, llegué al mejor algoritmo para encontrar una solución única, y que con el mismo estoy seguro que no puedes quitar ni una sola pista más sin que ya no tenga otra solución.
+
 
 
