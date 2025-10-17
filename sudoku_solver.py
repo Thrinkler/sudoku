@@ -1,4 +1,5 @@
 
+import math
 import random
 
 
@@ -6,6 +7,7 @@ class Solver:
 
     def __init__(self, sudoku: list[list[int]]) -> None:
         self.sudoku = [line[:] for line in sudoku]
+        self.unsolved_sudoku = [line[:] for line in sudoku]
         self.box_size = int(len(sudoku)**0.5)
 
 
@@ -36,22 +38,24 @@ class Solver:
 
 
     def solve_sudoku(self):
-        pila = []
+        self.sudoku = [line[:] for line in self.unsolved_sudoku]
+        memory = []
         empty_cell = self.empty_cells()
         i = 0
         while i< len(empty_cell):
             x,y = empty_cell[i]
             pos_values = list(self.posible_values(x,y))
+            #pos_values.sort(reverse=True)
             random.shuffle(pos_values)
             
             if len(pos_values) == 0: # Si no hay soluciones, nos regresamos uno
-                if not pila: return False # Si no hay donde regresar, no hay soluciones
-                self.sudoku,pos_values,i = pila.pop() #Regresamos y continuamos
+                if not memory: return False # Si no hay donde regresar, no hay soluciones
+                self.sudoku,pos_values,i = memory.pop() #Regresamos y continuamos
                 x,y = empty_cell[i]
             self.sudoku[x][y] = pos_values.pop()
 
             if pos_values:
-                pila.append([[line[:] for line in self.sudoku],pos_values,i])
+                memory.append([[line[:] for line in self.sudoku],pos_values,i])
                 
             i+=1
         return True 
@@ -59,43 +63,32 @@ class Solver:
     
 
     def find_all_solutions(self):
+        self.sudoku = [line[:] for line in self.unsolved_sudoku]
         solutions_count = 0
-        pila = []
+        memory = []
         empty_cell = self.empty_cells()
-
         i = 0
-        t = True
-
-        x,y = empty_cell[i]
+        x,y = [0,0]
         pos_values = list(self.posible_values(x,y))
-        has_found = False
-        while t:
-            
-            if i != len(empty_cell):
+        while True:
+            if i < len(empty_cell):
                 x,y = empty_cell[i]
                 pos_values = list(self.posible_values(x,y))
                 random.shuffle(pos_values)
-
             if i== len(empty_cell) or len(pos_values) == 0: # Si hay una solución, la contamos y regresamos
                 if i == len(empty_cell): 
                     solutions_count+=1
-                    has_found = True
-                if not pila: # Si no hay donde regresar, encontramos todas.
-                    return solutions_count
-                self.sudoku,pos_values,i = pila.pop()
+                if not memory: return solutions_count # Si no hay donde regresar, encontramos todas.
+                    
+                self.sudoku,pos_values,i = memory.pop()
                 x,y = empty_cell[i]
-                if has_found: 
-                    has_found = False
-                    continue
                 
             self.sudoku[x][y] = pos_values.pop()
             if len(pos_values) >0:
-                pila.append([[line[:] for line in self.sudoku],pos_values,i])
+                memory.append([[line[:] for line in self.sudoku],pos_values,i])
                 
             
             i+=1
-            
-        return solutions_count 
 
             
 

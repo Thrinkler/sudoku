@@ -27,7 +27,7 @@ class Creator:
             print(line)
 
 
-    def create_sudoku(self, max_clues=17):
+    def create_sudoku(self):
         sudoku = self.new_sudoku_ending()
 
         clues = len(sudoku)* len(sudoku[0])
@@ -41,13 +41,14 @@ class Creator:
         
         n =0
 
-        while clues > max_clues:
+        while True:
             if len(not_watched_clues) == 0: #Si ya se probó quitar todos los números y hay más de una solución si los quitas
                 return sudoku
             
             x,y = random.choice(not_watched_clues)
             removed_clue = sudoku[x][y]        
             sudoku[x][y] = 0
+            not_watched_clues.remove([x,y])
 
             s = Solver(sudoku)
             if(s.find_all_solutions() == 1):
@@ -57,13 +58,11 @@ class Creator:
 
             else:
                 sudoku[x][y] = removed_clue
-                not_watched_clues.remove([x,y])
             n+=1
             print(n, clues)
-        return sudoku
     
     
-    def create_min_sudoku(self, max_clues=17):
+    def create_min_sudoku(self):
         sudoku = self.new_sudoku_ending()
         solved_sudoku = [line[:] for line in sudoku]
 
@@ -78,13 +77,15 @@ class Creator:
         n =0
 
         min_ret_sudoku = []
-
+        min_clues = clues
         has_not_complete_one = True
 
-        while clues > max_clues and (n<500 or has_not_complete_one):
+        while (n<1000 or has_not_complete_one):
 
             if len(not_watched_clues) == 0: #Si ya se probó quitar todos los números y hay más de una solución si los quitas
-                min_ret_sudoku = [line[:] for line in sudoku]
+                if clues < min_clues:
+                    min_ret_sudoku = [line[:] for line in sudoku]
+                    min_clues = clues
                 has_not_complete_one = False
                 a,b = random.randint(0,len(sudoku)-1),random.randint(0,len(sudoku)-1)
 

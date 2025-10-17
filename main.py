@@ -22,7 +22,7 @@ def sudoku_test():
         print(line)
 
 def sudoku_creator():
-    sud = Creator(4).create_sudoku()
+    sud = Creator(3).create_min_sudoku()
 
     for line in sud:
         print(line)
@@ -38,6 +38,18 @@ def sudoku_creator():
     for line in solver.sudoku:
         print(line)
 
+def trivial_sudoku():
+    sud = [[0 for _ in range(9)] for _ in range(9)]
+
+    solver = Solver(sud)
+    solver.solve_sudoku()
+
+    for line in solver.sudoku:
+        print(line)
+
+
 if __name__ == "__main__":
     sudoku_creator()
+    #sudoku_test()
+    #trivial_sudoku()
 
